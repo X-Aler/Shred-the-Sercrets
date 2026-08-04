@@ -9,6 +9,7 @@ public class DocumentSpawner : MonoBehaviour
 
     public void Initialize()
     {
+        ShowDocuments();
         StartCoroutine(SpawnCoroutine());
     }
 
@@ -27,20 +28,25 @@ public class DocumentSpawner : MonoBehaviour
 
             documentStorage.AddDocument();
 
-            var currentCount = documentStorage.CurrentDocumentsCount;
-            var countToSpawn = currentCount / DocumentStorage.DocumentsInOneStack;
-
-            for (var i = 1; i <= countToSpawn; i++)
-            {
-                var document = documents.transform.Find(i.ToString());
-
-                if (document && !document.gameObject.activeSelf)
-                {
-                    document.gameObject.SetActive(true);
-                }
-            }
+            ShowDocuments();
 
             yield return StartCoroutine(WaitTimerCoroutine());
+        }
+    }
+
+    private void ShowDocuments()
+    {
+        var currentCount = GameServices.Instance.DocumentStorage.CurrentDocumentsCount;
+        var countToSpawn = Mathf.CeilToInt((float)currentCount / DocumentStorage.DocumentsInOneStack);
+
+        for (var i = 1; i <= countToSpawn; i++)
+        {
+            var document = documents.transform.Find(i.ToString());
+
+            if (document && !document.gameObject.activeSelf)
+            {
+                document.gameObject.SetActive(true);
+            }
         }
     }
 

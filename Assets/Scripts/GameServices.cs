@@ -8,7 +8,6 @@ namespace DefaultNamespace
         public static GameServices Instance { get; private set; }
         public MoneyManager MoneyManager { get; private set; }
         public DocumentStorage DocumentStorage { get; private set; }
-
         public DocumentTimer DocumentTimer { get; private set; }
         public static void Initialize()
         {

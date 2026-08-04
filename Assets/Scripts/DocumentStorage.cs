@@ -7,8 +7,9 @@ namespace DefaultNamespace
     public class DocumentStorage
     {
         public int DocumentsCapacity { get; private set; } = 20;
-        public int DocumentsSpawnTime { get; private set; } = 30;
+        public int DocumentsSpawnTime { get; private set; } = 5;
         public int CurrentDocumentsCount { get; private set; }
+        public bool IsDocumentsNull => CurrentDocumentsCount <= 0;
 
         public const int DocumentsInOneStack = 10;
 
@@ -23,13 +24,15 @@ namespace DefaultNamespace
             DocumentsUpdated?.Invoke(CurrentDocumentsCount, DocumentsCapacity);
         }
 
-        public void RemoveDocument()
+        public bool RemoveDocument()
         {
-            if (CurrentDocumentsCount <= 0) return;
+            if (IsDocumentsNull) return false;
 
             CurrentDocumentsCount--;
 
             DocumentsUpdated?.Invoke(CurrentDocumentsCount, DocumentsCapacity);
+
+            return true;
         }
     }
 }

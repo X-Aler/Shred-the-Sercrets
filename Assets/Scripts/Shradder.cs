@@ -1,26 +1,96 @@
-using System.Collections;
-using UnityEngine;
+using Assets.Scripts;
+using DefaultNamespace;
 using PrimeTween;
+using System.Collections;
+using TMPro;
+using UnityEngine;
 
 public class Shradder : MonoBehaviour
 {
     [SerializeField] private Trashcan trashcan;
+    [SerializeField] private TMP_Text stateText;
     [SerializeField] private Transform list;
-    [SerializeField] private Transform StartPoint;
-    [SerializeField] private Transform EndPoint;
+    [SerializeField] private Transform startPoint;
+    [SerializeField] private Transform endPoint;
 
-    private const int maxEnergy = 100;
+    [SerializeField] private int maxEnergy = 100;
+    public int CurrentEnergy { get; private set; }
 
-    private int currentEnergy;
-    public int CurrentEnergy => currentEnergy;
+    private State _currentState; 
+    public State CurrentState
+    {
+        get => _currentState;
+        private set
+        {
+            _currentState = value;
+            UpdateText(value);
+        }
+    }
 
-    public void Activate() => StartCoroutine(ActivateCoroutine());
+    private void Awake()
+    {
+        CurrentEnergy = maxEnergy;
+        CurrentState = State.Idle;
+    }
+
+    public void Activate()
+    {
+        if (CurrentState != State.Idle) return;
+
+        CurrentState = State.Woriking;
+
+        GameServices.Instance.DocumentStorage.RemoveDocument();
+
+        StartCoroutine(ActivateCoroutine());
+    }
+    public void Rechange()
+    {
+        CurrentState = State.Idle;
+
+        CurrentEnergy = maxEnergy;
+    } 
 
     private IEnumerator ActivateCoroutine()
     {
         list.gameObject.SetActive(true);
-        var tween = Tween.Position(list, StartPoint.position, EndPoint.position, duration: 5f, ease: Ease.InSine);
-        yield return new WaitForSeconds(tween.duration);
+
+        yield return Tween.Position(list, startPoint.position, endPoint.position, duration: 5f, ease: Ease.InSine);
+
         list.gameObject.SetActive(false);
+
+        CurrentEnergy--;
+
+        trashcan.AddTrash();
+
+        if (CurrentEnergy > 0) CurrentState = State.Idle;
+        else CurrentState = State.Discharged;
+    }
+
+    private void UpdateText(State state)
+    {
+        switch (state)
+        {
+            case State.Idle:
+                stateText.text = "Простаивает";
+                stateText.color = Color.green;
+                break;
+            case State.Woriking:
+                stateText.text = "Работает";
+                stateText.color = Color.yellow;
+                break;
+            case State.Discharged:
+                stateText.text = "Разряжен";
+                stateText.color = Color.red;
+                break;
+        }
+    }
+
+    private void OnMouseEnter()
+    {
+        stateText.gameObject.SetActive(true);
+    }
+    private void OnMouseExit()
+    {
+        stateText.gameObject.SetActive(false);
     }
 }

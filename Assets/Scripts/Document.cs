@@ -1,74 +1,35 @@
 using DefaultNamespace;
 using UnityEngine;
 
-public class Document : MonoBehaviour
+public class Document : DraggableItem
 {
-    private Camera mainCamera;
-    private bool isDragging = true;
-    private bool isInZone = false;
-
     private Shradder dropShradder = null;
 
-    private void Start()
-    {
-        mainCamera = Camera.main;
-        UpdatePositionToMouse();
-    }
-
-    private void Update()
-    {
-        if (isDragging)
-        {
-            UpdatePositionToMouse();
-
-            if (Input.GetMouseButtonUp(0))
-            {
-                isDragging = false;
-                CheckDrop();
-            }
-        }
-    }
-
-    private void UpdatePositionToMouse()
-    {
-        var mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        mousePosition.z = 0f;
-        transform.position = mousePosition;
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected override void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("ShrederZone"))
         {
-            dropShradder = collision.gameObject.GetComponent<Shradder>();
+            dropShradder = collision.GetComponent<Shradder>();
+            inZone = true;
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    protected override void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.CompareTag("ShrederZone"))
         {
             dropShradder = null;
+            inZone = false;
         }
     }
 
-    private void CheckDrop()
+    protected override void OnSuccessfulDrop()
     {
-        if (dropShradder)
+        if (dropShradder != null)
         {
-            OnSuccessfulDrop();
-            Destroy(gameObject);
+            dropShradder.Activate();
         }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
 
-    private void OnSuccessfulDrop()
-    {
-        GameServices.Instance.DocumentStorage.RemoveDocument();
-
-        dropShradder.Activate();
+        base.OnSuccessfulDrop();
     }
 }

@@ -25,6 +25,12 @@ public class DocumentsZone : MonoBehaviour
         if (itemPrefab == null) return;
 
         spawnPosition.z = 0f;
-        Instantiate(itemPrefab, spawnPosition, Quaternion.identity);
+
+        GameObject spawnedItem = Instantiate(itemPrefab, spawnPosition, Quaternion.identity);
+
+        if (spawnedItem.TryGetComponent<DraggableItem>(out DraggableItem draggable))
+        {
+            draggable.ForceStartDrag();
+        }
     }
 }

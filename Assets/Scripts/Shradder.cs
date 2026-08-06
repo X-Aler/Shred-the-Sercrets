@@ -12,6 +12,9 @@ public class Shradder : MonoBehaviour
     [SerializeField] private Transform list;
     [SerializeField] private Transform startPoint;
     [SerializeField] private Transform endPoint;
+    [SerializeField] private GameObject rechangeButton;
+
+    [SerializeField] private Crank crank;
 
     [SerializeField] private int maxEnergy = 100;
     public int CurrentEnergy { get; private set; }
@@ -88,9 +91,19 @@ public class Shradder : MonoBehaviour
     private void OnMouseEnter()
     {
         stateText.gameObject.SetActive(true);
+
+        if (CurrentState == State.Discharged)
+        {
+            rechangeButton.SetActive(true);
+        }
     }
     private void OnMouseExit()
     {
         stateText.gameObject.SetActive(false);
+
+        if (CurrentState == State.Discharged)
+        {
+            rechangeButton.SetActive(false);
+        }
     }
 }

@@ -22,4 +22,6 @@ public class MoneyManager
 
         BalanceChanged?.Invoke(balance);
     }
+
+    public void SetBalance(int newBalance) => balance = newBalance;
 }

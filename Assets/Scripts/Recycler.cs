@@ -8,6 +8,8 @@ public class Recycler : MonoBehaviour
 {
     [SerializeField] private Sprite woringSprite;
     [SerializeField] private Sprite idleSprite;
+    [SerializeField] private Collider2D coinsSpawnZone;
+    [SerializeField] private GameObject coinPrefab;
 
     private SpriteRenderer spriteRenderer;
 
@@ -38,13 +40,24 @@ public class Recycler : MonoBehaviour
 
         for (int i = 0; i < trashCount; i++)
         {
-            yield return Tween.ShakeLocalPosition(transform, new Vector3(0.5f, 0.5f, 0), 3);
+            yield return Tween.ShakeLocalPosition(transform, new Vector3(0.1f, 0, 0), 3, 25, true, Ease.InOutSine);
 
-            GameServices.Instance.MoneyManager.AddBalance(1);
+            SpawnCoin();
         }
 
         spriteRenderer.sprite = idleSprite;
 
         currentState = State.Idle;
+    }
+
+    private void SpawnCoin()
+    {
+        var bounds = coinsSpawnZone.bounds;
+        var randomPosX = Random.Range(bounds.min.x, bounds.max.x);
+        var spawnPos = new Vector3(randomPosX, coinsSpawnZone.transform.position.y, 0);
+
+        var coinObj = Instantiate(coinPrefab, spawnPos, Quaternion.identity);
+        var coin = coinObj.GetComponent<Coin>();
+        coin.Initialize();
     }
 }

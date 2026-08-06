@@ -1,0 +1,20 @@
+{
+    "intExample": 5,
+    "strExample": "Hello!",
+    "boolExample": [
+        false,
+        false,
+        false,
+        false
+    ],
+    "idSave": 1,
+    "coins": 0,
+    "upgradeLevels": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+    ]
+}

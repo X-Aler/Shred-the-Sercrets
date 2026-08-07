@@ -16,8 +16,9 @@ public class UpgradeButton : MonoBehaviour
 
     private void OnEnable()
     {
-        // Подписываемся на загрузку данных из облака
+        // Подписываемся на Я.Игры и сразу обновляем тексты при открытии окна
         YG2.onGetSDKData += UpdateUI;
+        UpdateUI();
     }
 
     private void OnDisable()
@@ -31,34 +32,49 @@ public class UpgradeButton : MonoBehaviour
         UpdateUI();
     }
 
+    // Проверяем баланс каждый кадр. 
+    // Это самый надежный способ для UI, исключающий любые баги с событиями.
+    private void Update()
+    {
+        // Если данные еще не загрузились — ничего не делаем
+        if (UpgradeManager.Instance == null || data == null || GameServices.Instance == null || GameServices.Instance.MoneyManager == null)
+            return;
+
+        int currentLevel = UpgradeManager.Instance.GetLevelByData(data);
+
+        // Если уровень максимальный — намертво отключаем
+        if (currentLevel >= data.maxLevel)
+        {
+            buyButton.interactable = false;
+        }
+        else
+        {
+            // Сверяем цену и текущий баланс
+            int cost = data.GetCost(currentLevel);
+            buyButton.interactable = GameServices.Instance.MoneyManager.Balance >= cost;
+        }
+    }
+
+    // UpdateUI теперь отвечает только за обновление ТЕКСТОВ (цена, название, уровень)
     public void UpdateUI()
     {
         if (UpgradeManager.Instance == null || data == null) return;
 
         int currentLevel = UpgradeManager.Instance.GetLevelByData(data);
 
-        // Название и уровень
         if (titleText != null)
         {
             titleText.text = $"{data.upgradeName} (Ур. {currentLevel}/{data.maxLevel})";
         }
 
-        // Состояние кнопки и цены
         if (currentLevel >= data.maxLevel)
         {
             if (costText != null) costText.text = "МАКС.";
-            buyButton.interactable = false;
         }
         else
         {
             int cost = data.GetCost(currentLevel);
-
-            // Форматируем число с пробелами (например, 10 000 вместо 10000)
             if (costText != null) costText.text = cost.ToString("#,##0");
-
-            // Проверяем баланс для активности кнопки
-            bool canAfford = GameServices.Instance.MoneyManager.Balance >= cost;
-            buyButton.interactable = canAfford;
         }
     }
 
@@ -74,15 +90,11 @@ public class UpgradeButton : MonoBehaviour
             // Списываем монеты
             GameServices.Instance.MoneyManager.RemoveBalance(cost);
 
-            // Повышаем уровень и применение эффекта (происходит внутри UpgradeManager)
+            // Повышаем уровень и применяем эффект
             UpgradeManager.Instance.Upgrade(data);
 
-            // Обновляем UI
+            // Обновляем тексты
             UpdateUI();
-        }
-        else
-        {
-            Debug.Log("Недостаточно монет!");
         }
     }
 }

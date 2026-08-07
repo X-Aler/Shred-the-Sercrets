@@ -11,24 +11,24 @@ public class Recycler : MonoBehaviour
     [SerializeField] private Collider2D coinsSpawnZone;
     [SerializeField] private GameObject coinPrefab;
 
-    private SpriteRenderer spriteRenderer;
+    [Header("Базовое время переработки (если UpgradeManager отсутствует)")]
+    [SerializeField] private float defaultRecycleDuration = 3f;
 
+    private SpriteRenderer spriteRenderer;
     private State currentState;
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-
         currentState = State.Idle;
-
         spriteRenderer.sprite = idleSprite;
     }
+
     public bool Activate(int trashCount)
     {
         if (currentState != State.Idle) return false;
 
         currentState = State.Woriking;
-
         StartCoroutine(ActivateCoroutine(trashCount));
 
         return true;
@@ -38,16 +38,28 @@ public class Recycler : MonoBehaviour
     {
         spriteRenderer.sprite = woringSprite;
 
+        float recycleDuration = GetCurrentRecycleDuration();
+
         for (int i = 0; i < trashCount; i++)
         {
-            yield return Tween.ShakeLocalPosition(transform, new Vector3(0.1f, 0, 0), 3, 25, true, Ease.InOutSine);
+            yield return Tween.ShakeLocalPosition(transform, new Vector3(0.1f, 0, 0), duration: recycleDuration, frequency: 25, true, Ease.Linear);
 
             SpawnCoin();
         }
 
         spriteRenderer.sprite = idleSprite;
-
         currentState = State.Idle;
+    }
+
+    private float GetCurrentRecycleDuration()
+    {
+        if (UpgradeManager.Instance != null && UpgradeManager.Instance.recycleSpeedData != null)
+        {
+            int level = UpgradeManager.Instance.RecycleSpeedLevel;
+            return UpgradeManager.Instance.recycleSpeedData.GetValue(level);
+        }
+
+        return defaultRecycleDuration;
     }
 
     private void SpawnCoin()

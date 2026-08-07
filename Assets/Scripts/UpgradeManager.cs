@@ -1,3 +1,4 @@
+using DefaultNamespace;
 using UnityEngine;
 using YG;
 
@@ -14,6 +15,9 @@ public class UpgradeManager : MonoBehaviour
     public UpgradeData coinCountData;
 
     private int[] localLevels = new int[6];
+
+    [Header("Ссылки на контроллеры сцены")]
+    public ShredderController shredderController;
 
     public int ShredderCountLevel => localLevels[0];
     public int ShredderSpeedLevel => localLevels[1];
@@ -40,7 +44,17 @@ public class UpgradeManager : MonoBehaviour
 
     private void Start()
     {
-        if (YG2.isSDKEnabled) LoadLevels();
+        if (YG2.isSDKEnabled)
+        {
+            // Если сохранения уже загружены, применяем их
+            LoadLevels();
+        }
+        else
+        {
+            // ВАЖНО: Если SDK еще грузится, нам нужно инициализировать игру базовыми значениями!
+            // Так как localLevels сейчас везде равны 0, метод GetValue(0) возьмет именно baseValue из ваших ScriptableObject.
+            ApplyAllEffectsOnLoad();
+        }
     }
 
     public void LoadLevels()
@@ -51,6 +65,8 @@ public class UpgradeManager : MonoBehaviour
         }
 
         System.Array.Copy(YG2.saves.upgradeLevels, localLevels, 6);
+
+        ApplyAllEffectsOnLoad();
     }
 
     public void Upgrade(UpgradeData upgrade)
@@ -60,13 +76,10 @@ public class UpgradeManager : MonoBehaviour
 
         localLevels[index]++;
 
-        // 1. Сохраняем в массиве
         YG2.saves.upgradeLevels[index] = localLevels[index];
 
-        // 2. Сохраняем монеты и вызываем облачное сохранение
         SaveManager.SaveAllData();
 
-        // 3. Применяем игровой эффект апгрейда
         ApplyEffect(upgrade, localLevels[index]);
     }
 
@@ -90,16 +103,51 @@ public class UpgradeManager : MonoBehaviour
 
     private void ApplyEffect(UpgradeData upgrade, int level)
     {
-        float value = upgrade.GetValue(level);
+        if (upgrade == null) return;
+
+        int calculatedValue = upgrade.GetValue(level);
 
         if (upgrade == shredderCountData)
         {
-            // Устанавливаем количество шредеров = (int)value
+            if (shredderController != null)
+            {
+                shredderController.UpdateShreddersVisibility();
+            }
         }
-        else if (upgrade == recycleSpeedData)
+        else if (upgrade == capacityData)
         {
-            // Устанавливаем время задержки переработки = value (уменьшенное время)
+            int newCapacity = Mathf.RoundToInt(calculatedValue);
+
+            if (GameServices.Instance != null && GameServices.Instance.DocumentStorage != null)
+            {
+                GameServices.Instance.DocumentStorage.SetCapacity(newCapacity);
+            }
         }
-        // и т.д.
+        else if (upgrade == refreshSpeedData)
+        {
+            int newSpawnTime = Mathf.RoundToInt(calculatedValue);
+
+            if (GameServices.Instance != null && GameServices.Instance.DocumentStorage != null)
+            {
+                GameServices.Instance.DocumentStorage.SetSpawnTime(newSpawnTime);
+            }
+        }
+        else if (upgrade == coinCountData)
+        {
+            if (GameServices.Instance != null && GameServices.Instance.MoneyManager != null)
+            {
+                GameServices.Instance.MoneyManager.IncomeMultiplier = calculatedValue;
+            }
+        }
+    }
+
+    public void ApplyAllEffectsOnLoad()
+    {
+        ApplyEffect(shredderCountData, ShredderCountLevel);
+        ApplyEffect(shredderSpeedData, ShredderSpeedLevel);
+        ApplyEffect(capacityData, CapacityLevel);
+        ApplyEffect(refreshSpeedData, RefreshSpeedLevel);
+        ApplyEffect(recycleSpeedData, RecycleSpeedLevel);
+        ApplyEffect(coinCountData, CoinCountLevel);
     }
 }

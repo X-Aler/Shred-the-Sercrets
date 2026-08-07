@@ -5,7 +5,6 @@ public enum UpgradeEffectType
 {
     Additive,       // Прибавление: baseValue + (level * valuePerLevel)
     Subtractive,    // Уменьшение (например, задержка): baseValue - (level * valuePerLevel)
-    Multiplier      // Умножение: baseValue * (1 + level * valuePerLevel)
 }
 
 [CreateAssetMenu(fileName = "NewUpgrade", menuName = "Upgrades/Upgrade Data")]
@@ -25,15 +24,15 @@ public class UpgradeData : ScriptableObject
     [Tooltip("Базовая цена для формулы")]
     public int baseCost = 100;
     [Tooltip("Множитель цены для формулы")]
-    public float costMultiplier = 1.5f;
+    public int costMultiplier = 1;
 
     [Header("Настройка эффекта")]
     public UpgradeEffectType effectType = UpgradeEffectType.Additive;
-    public float baseValue = 1f;
-    public float valuePerLevel = 0.1f;
+    public int baseValue = 1;
+    public int valuePerLevel = 0;
 
     [Tooltip("Минимально допустимое значение (актуально для уменьшения времени, чтобы не уйти в 0 или минус)")]
-    public float minValue = 0.05f;
+    public int minValue = 0;
 
     /// <summary>
     /// Получение стоимости следующего уровня
@@ -63,9 +62,9 @@ public class UpgradeData : ScriptableObject
     /// <summary>
     /// Получение значения параметра в зависимости от типа эффекта
     /// </summary>
-    public float GetValue(int currentLevel)
+    public int GetValue(int currentLevel)
     {
-        float result = baseValue;
+        int result = baseValue;
 
         switch (effectType)
         {
@@ -77,10 +76,6 @@ public class UpgradeData : ScriptableObject
                 // Уменьшаем время/задержку с каждым уровнем
                 result = baseValue - (currentLevel * valuePerLevel);
                 result = Mathf.Max(minValue, result); // Не даем опуститься ниже минимального порога
-                break;
-
-            case UpgradeEffectType.Multiplier:
-                result = baseValue * Mathf.Pow(1f + valuePerLevel, currentLevel);
                 break;
         }
 

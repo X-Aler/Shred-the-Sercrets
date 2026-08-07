@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: ShredderSpeedUpgrade
   m_EditorClassIdentifier: Assembly-CSharp::UpgradeData
   upgradeName: "\u0421\u043A\u043E\u0440\u043E\u0441\u0442\u044C \u0448\u0440\u0435\u0434\u0435\u0440\u043E\u0432"
-  maxLevel: 5
+  maxLevel: 4
   useCustomCosts: 1
-  customCosts: 6400000058020000dc05000088130000d4300000
+  customCosts: 05000000190000004b00000096000000
   baseCost: 100
-  costMultiplier: 5
+  costMultiplier: 1
   effectType: 1
   baseValue: 5
   valuePerLevel: 1
-  minValue: 0.5
+  minValue: 1

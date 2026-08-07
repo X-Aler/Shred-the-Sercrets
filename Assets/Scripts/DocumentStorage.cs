@@ -6,14 +6,25 @@ namespace DefaultNamespace
 {
     public class DocumentStorage
     {
-        public int DocumentsCapacity { get; private set; } = 20;
-        public int DocumentsSpawnTime { get; private set; } = 5;
+        public int DocumentsCapacity { get; private set; }
+        public int DocumentsSpawnTime { get; private set; }
         public int CurrentDocumentsCount { get; private set; }
         public bool IsDocumentsNull => CurrentDocumentsCount <= 0;
 
         public const int DocumentsInOneStack = 10;
 
         public event Action<int, int> DocumentsUpdated;
+
+        public void SetCapacity(int newCapacity)
+        {
+            DocumentsCapacity = newCapacity;
+            DocumentsUpdated?.Invoke(CurrentDocumentsCount, DocumentsCapacity);
+        }
+
+        public void SetSpawnTime(int newSpawnTime)
+        {
+            DocumentsSpawnTime = Mathf.Max(1, newSpawnTime);
+        }
 
         public void AddDocument()
         {

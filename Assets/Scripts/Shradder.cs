@@ -19,7 +19,10 @@ public class Shradder : MonoBehaviour
     [SerializeField] private int maxEnergy = 100;
     public int CurrentEnergy { get; private set; }
 
-    private State _currentState; 
+    [Header("Базовое время работы (если UpgradeManager отсутствует)")]
+    [SerializeField] private float defaultDuration = 5f;
+
+    private State _currentState;
     public State CurrentState
     {
         get => _currentState;
@@ -46,18 +49,20 @@ public class Shradder : MonoBehaviour
 
         StartCoroutine(ActivateCoroutine());
     }
+
     public void Rechange()
     {
         CurrentState = State.Idle;
-
         CurrentEnergy = maxEnergy;
-    } 
+    }
 
     private IEnumerator ActivateCoroutine()
     {
         list.gameObject.SetActive(true);
 
-        yield return Tween.Position(list, startPoint.position, endPoint.position, duration: 5f, ease: Ease.InSine);
+        float workDuration = GetCurrentWorkDuration();
+
+        yield return Tween.Position(list, startPoint.position, endPoint.position, duration: workDuration, ease: Ease.InSine);
 
         list.gameObject.SetActive(false);
 
@@ -67,6 +72,16 @@ public class Shradder : MonoBehaviour
 
         if (CurrentEnergy > 0) CurrentState = State.Idle;
         else CurrentState = State.Discharged;
+    }
+    private float GetCurrentWorkDuration()
+    {
+        if (UpgradeManager.Instance != null && UpgradeManager.Instance.shredderSpeedData != null)
+        {
+            int level = UpgradeManager.Instance.ShredderSpeedLevel;
+            return UpgradeManager.Instance.shredderSpeedData.GetValue(level);
+        }
+
+        return defaultDuration;
     }
 
     private void UpdateText(State state)
@@ -97,6 +112,7 @@ public class Shradder : MonoBehaviour
             rechangeButton.SetActive(true);
         }
     }
+
     private void OnMouseExit()
     {
         stateText.gameObject.SetActive(false);

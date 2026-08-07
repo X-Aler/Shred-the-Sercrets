@@ -1,27 +1,38 @@
 using System;
 using UnityEngine;
 
-public class MoneyManager
+namespace DefaultNamespace
 {
-    private int balance;
-    public int Balance => balance;
-
-    public event Action<int> BalanceChanged;
-    public void AddBalance(int amount)
+    public class MoneyManager
     {
-        balance += amount;
+        public int Balance { get; private set; }
 
-        BalanceChanged?.Invoke(balance);
+        public int IncomeMultiplier { get; set; } = 1;
+
+        public event Action<int> BalanceChanged;
+
+        public void AddBalance(int amount)
+        {
+            int finalAmount = amount * IncomeMultiplier;
+
+            Balance += finalAmount;
+
+            BalanceChanged?.Invoke(Balance);
+        }
+
+        public void RemoveBalance(int amount)
+        {
+            if (Balance < amount) return;
+
+            Balance -= amount;
+
+            BalanceChanged?.Invoke(Balance);
+        }
+
+        public void SetBalance(int newBalance)
+        {
+            Balance = newBalance;
+            BalanceChanged?.Invoke(Balance);
+        }
     }
-
-    public void RemoveBalance(int amount)
-    {
-        if (amount > balance) return;
-
-        balance -= amount;
-
-        BalanceChanged?.Invoke(balance);
-    }
-
-    public void SetBalance(int newBalance) => balance = newBalance;
 }

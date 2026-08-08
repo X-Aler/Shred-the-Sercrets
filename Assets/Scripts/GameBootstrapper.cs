@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using YG;
 
 namespace DefaultNamespace
 {
@@ -15,6 +16,13 @@ namespace DefaultNamespace
             if (gameData != null) gameData.Initialize();
             if (hudScreen != null) hudScreen.Initialize();
             if (documentSpawner != null) documentSpawner.Initialize();
+
+            YG2.GameReadyAPI();
+        }
+
+        private void Start()
+        {
+            YG2.StickyAdActivity(true);
         }
     }
 }

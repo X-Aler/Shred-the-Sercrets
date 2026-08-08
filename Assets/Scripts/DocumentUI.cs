@@ -20,7 +20,15 @@ namespace DefaultNamespace
         }
         private void UpdateUI(int currentCount, int capacity)
         {
-            documentText.text = $"Количество - {currentCount}/{capacity}";
+            // Проверяем язык через менеджер
+            bool isEnglish = LocalizationManager.Instance != null &&
+                             LocalizationManager.Instance.CurrentLanguage == Language.English;
+
+            // Выбираем нужный шаблон
+            string textTemplate = isEnglish ? "Amount" : "Количество";
+
+            // Выводим в UI
+            documentText.text = $"{textTemplate} - {currentCount}/{capacity}";
         }
 
         public void Dispose()

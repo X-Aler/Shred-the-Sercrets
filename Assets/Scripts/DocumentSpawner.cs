@@ -9,8 +9,26 @@ public class DocumentSpawner : MonoBehaviour
 
     public void Initialize()
     {
+        // Подписываемся на изменение количества документов
+        GameServices.Instance.DocumentStorage.DocumentsUpdated += OnDocumentsUpdated;
+
         ShowDocuments();
         StartCoroutine(SpawnCoroutine());
+    }
+
+    private void OnDestroy()
+    {
+        // Обязательно отписываемся, чтобы избежать утечек памяти
+        if (GameServices.Instance?.DocumentStorage != null)
+        {
+            GameServices.Instance.DocumentStorage.DocumentsUpdated -= OnDocumentsUpdated;
+        }
+    }
+
+    // Обработчик события
+    private void OnDocumentsUpdated(int current, int capacity)
+    {
+        ShowDocuments();
     }
 
     private IEnumerator SpawnCoroutine()
@@ -28,7 +46,8 @@ public class DocumentSpawner : MonoBehaviour
 
             documentStorage.AddDocument();
 
-            ShowDocuments();
+            // Вызов ShowDocuments() отсюда можно даже убрать, 
+            // так как он всё равно сработает через событие из AddDocument()
 
             yield return StartCoroutine(WaitTimerCoroutine());
         }
@@ -39,6 +58,13 @@ public class DocumentSpawner : MonoBehaviour
         var currentCount = GameServices.Instance.DocumentStorage.CurrentDocumentsCount;
         var countToSpawn = Mathf.CeilToInt((float)currentCount / DocumentStorage.DocumentsInOneStack);
 
+        // 1. Выключаем все пачки
+        foreach (Transform document in documents.transform)
+        {
+            document.gameObject.SetActive(false);
+        }
+
+        // 2. Включаем только нужные (если countToSpawn == 0, цикл просто не выполнится)
         for (var i = 1; i <= countToSpawn; i++)
         {
             var document = documents.transform.Find(i.ToString());

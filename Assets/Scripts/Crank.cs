@@ -57,6 +57,7 @@ public class Crank : MonoBehaviour
 
     public void StartDrag()
     {
+        AudioManager.Instance.PlayLoopingSound(AudioManager.Instance.crankSound, 1);
         isDragging = true;
         previousAngle = GetMouseAngle();
     }
@@ -64,6 +65,7 @@ public class Crank : MonoBehaviour
     public void StopDrag()
     {
         isDragging = false;
+        AudioManager.Instance.StopLoopingSound(AudioManager.Instance.crankSound);
     }
 
     private float GetMouseAngle()

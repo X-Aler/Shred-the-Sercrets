@@ -15,10 +15,10 @@ MonoBehaviour:
   upgradeName: "\u041C\u043D\u043E\u0436\u0438\u0442\u0435\u043B\u044C \u043C\u043E\u043D\u0435\u0442"
   maxLevel: 5
   useCustomCosts: 1
-  customCosts: 280000005f000000c8000000c2010000
+  customCosts: 010000005f000000c8000000c2010000
   baseCost: 500
   costMultiplier: 1
   effectType: 0
   baseValue: 1
-  valuePerLevel: 1
+  valuePerLevel: 1000
   minValue: 1

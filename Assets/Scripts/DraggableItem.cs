@@ -18,6 +18,7 @@ public abstract class DraggableItem : MonoBehaviour
 
     public void ForceStartDrag()
     {
+        AudioManager.Instance.PlaySFX(AudioManager.Instance.documentTakeSound);
         isDragging = true;
     }
 

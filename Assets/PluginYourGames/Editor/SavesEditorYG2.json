@@ -7,14 +7,14 @@
         false,
         false
     ],
-    "idSave": 14,
-    "coins": 47,
+    "idSave": 31,
+    "coins": 150212,
     "upgradeLevels": [
         3,
         4,
-        0,
-        2,
-        2,
-        3
+        10,
+        5,
+        4,
+        5
     ]
 }

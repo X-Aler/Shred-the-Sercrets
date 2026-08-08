@@ -62,7 +62,11 @@ public class Shradder : MonoBehaviour
 
         float workDuration = GetCurrentWorkDuration();
 
+        AudioManager.Instance.PlayLoopingSound(AudioManager.Instance.ShradderSound, 2);
+
         yield return Tween.Position(list, startPoint.position, endPoint.position, duration: workDuration, ease: Ease.InSine);
+
+        AudioManager.Instance.StopLoopingSound(AudioManager.Instance.ShradderSound);
 
         list.gameObject.SetActive(false);
 
@@ -86,18 +90,23 @@ public class Shradder : MonoBehaviour
 
     private void UpdateText(State state)
     {
+        bool isEnglish = LocalizationManager.Instance != null &&
+                         LocalizationManager.Instance.CurrentLanguage == Language.English;
+
         switch (state)
         {
             case State.Idle:
-                stateText.text = "Простаивает";
+                stateText.text = isEnglish ? "Idle" : "Простаивает";
                 stateText.color = Color.green;
                 break;
+
             case State.Woriking:
-                stateText.text = "Работает";
+                stateText.text = isEnglish ? "Working" : "Работает";
                 stateText.color = Color.yellow;
                 break;
+
             case State.Discharged:
-                stateText.text = "Разряжен";
+                stateText.text = isEnglish ? "Discharged" : "Разряжен";
                 stateText.color = Color.red;
                 break;
         }

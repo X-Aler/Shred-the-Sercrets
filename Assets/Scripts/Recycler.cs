@@ -42,7 +42,11 @@ public class Recycler : MonoBehaviour
 
         for (int i = 0; i < trashCount; i++)
         {
+            AudioManager.Instance.PlayLoopingSound(AudioManager.Instance.RecyclerSound, 0.75f);
+
             yield return Tween.ShakeLocalPosition(transform, new Vector3(0.1f, 0, 0), duration: recycleDuration, frequency: 25, true, Ease.Linear);
+
+            AudioManager.Instance.StopLoopingSound(AudioManager.Instance.RecyclerSound);
 
             SpawnCoin();
         }

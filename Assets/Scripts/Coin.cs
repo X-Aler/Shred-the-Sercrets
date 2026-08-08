@@ -13,6 +13,8 @@ public class Coin : MonoBehaviour
     {
         initialized = true;
 
+        AudioManager.Instance.PlaySFX(AudioManager.Instance.coinSound);
+
         StartCoroutine(WaitCoroutine());
     }
 

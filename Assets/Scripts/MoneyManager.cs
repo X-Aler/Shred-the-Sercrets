@@ -9,11 +9,13 @@ namespace DefaultNamespace
 
         public int IncomeMultiplier { get; set; } = 1;
 
+        public int ADMultipler { get; set; } = 1;
+
         public event Action<int> BalanceChanged;
 
         public void AddBalance(int amount)
         {
-            int finalAmount = amount * IncomeMultiplier;
+            int finalAmount = (amount * IncomeMultiplier) * ADMultipler;
 
             Balance += finalAmount;
 

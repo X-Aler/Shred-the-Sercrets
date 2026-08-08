@@ -21,7 +21,12 @@ namespace DefaultNamespace
 
         private void UpdateUI(int time)
         {
-            timerText.text = $"Время обновления - {time}";
+            bool isEnglish = LocalizationManager.Instance != null &&
+                             LocalizationManager.Instance.CurrentLanguage == Language.English;
+
+            string label = isEnglish ? "Refresh time" : "Время обновления";
+
+            timerText.text = $"{label} - {time}";
         }
 
         public void Dispose()

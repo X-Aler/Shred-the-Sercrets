@@ -10,7 +10,6 @@ public class UpgradeButton : MonoBehaviour
     public UpgradeData data;
 
     [Header("UI Элементы")]
-    public TMP_Text titleText;
     public TMP_Text costText;
     public Button buyButton;
 
@@ -60,16 +59,17 @@ public class UpgradeButton : MonoBehaviour
     {
         if (UpgradeManager.Instance == null || data == null) return;
 
-        int currentLevel = UpgradeManager.Instance.GetLevelByData(data);
+        bool isEnglish = LocalizationManager.Instance != null &&
+                         LocalizationManager.Instance.CurrentLanguage == Language.English;
 
-        if (titleText != null)
-        {
-            titleText.text = $"{data.upgradeName} (Ур. {currentLevel}/{data.maxLevel})";
-        }
+        int currentLevel = UpgradeManager.Instance.GetLevelByData(data);
 
         if (currentLevel >= data.maxLevel)
         {
-            if (costText != null) costText.text = "МАКС.";
+            if (costText != null)
+            {
+                costText.text = isEnglish ? "MAX" : "МАКС.";
+            }
         }
         else
         {
@@ -85,6 +85,8 @@ public class UpgradeButton : MonoBehaviour
 
         int cost = data.GetCost(currentLevel);
 
+        AudioManager.Instance.PlaySFX(AudioManager.Instance.buttonSound);
+
         if (GameServices.Instance.MoneyManager.Balance >= cost)
         {
             // Списываем монеты
@@ -95,6 +97,10 @@ public class UpgradeButton : MonoBehaviour
 
             // Обновляем тексты
             UpdateUI();
+
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.buySound);
+
+            YG2.InterstitialAdvShow();
         }
     }
 }

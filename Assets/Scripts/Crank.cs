@@ -5,12 +5,19 @@ public class Crank : MonoBehaviour
 {
     [SerializeField] private Slider progressBar;
     [SerializeField] private GameObject UI;
+    [SerializeField] private GameObject crankUI;
 
+    private Camera mainCamera;
     private Shradder shradder;
 
     private bool isDragging = false;
     private float previousAngle = 0f;
     private float totalRotation = 0f;
+
+    private void Awake()
+    {
+        mainCamera = Camera.main;
+    }
 
     void Update()
     {
@@ -42,6 +49,7 @@ public class Crank : MonoBehaviour
         this.shradder = shradder;
         progressBar.value = progressBar.minValue;
         UI.SetActive(true);
+        crankUI.SetActive(true);
     }
 
     private void OnFullCircleComplete()
@@ -50,6 +58,7 @@ public class Crank : MonoBehaviour
         {
             StopDrag();
             UI.SetActive(false);
+            crankUI.SetActive(false);
             shradder.Rechange();
         }
         else progressBar.value += 0.1f;
@@ -70,7 +79,13 @@ public class Crank : MonoBehaviour
 
     private float GetMouseAngle()
     {
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
+        if (mainCamera == null)
+            mainCamera = Camera.main;
+
+        if (mainCamera == null)
+            return previousAngle;
+
+        Vector3 screenPos = mainCamera.WorldToScreenPoint(transform.position);
         Vector3 direction = Input.mousePosition - screenPos;
         return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
     }

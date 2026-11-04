@@ -39,6 +39,26 @@ public class Shradder : MonoBehaviour
         CurrentState = State.Idle;
     }
 
+    private void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += RefreshStateText;
+    }
+
+    private void Start()
+    {
+        RefreshStateText();
+    }
+
+    private void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= RefreshStateText;
+    }
+
+    private void RefreshStateText()
+    {
+        UpdateText(CurrentState);
+    }
+
     public void Activate()
     {
         if (CurrentState != State.Idle) return;
@@ -90,6 +110,9 @@ public class Shradder : MonoBehaviour
 
     private void UpdateText(State state)
     {
+        if (stateText == null)
+            return;
+
         bool isEnglish = LocalizationManager.Instance != null &&
                          LocalizationManager.Instance.CurrentLanguage == Language.English;
 

@@ -1,3 +1,4 @@
+using System;
 using DefaultNamespace;
 using UnityEngine;
 using YG;
@@ -5,6 +6,7 @@ using YG;
 public class UpgradeManager : MonoBehaviour
 {
     public static UpgradeManager Instance { get; private set; }
+    public event Action UpgradesChanged;
 
     [Header("Данные всех улучшений (по порядку 0-5)")]
     public UpgradeData shredderCountData;
@@ -67,6 +69,7 @@ public class UpgradeManager : MonoBehaviour
         System.Array.Copy(YG2.saves.upgradeLevels, localLevels, 6);
 
         ApplyAllEffectsOnLoad();
+        UpgradesChanged?.Invoke();
     }
 
     public void Upgrade(UpgradeData upgrade)
@@ -81,6 +84,7 @@ public class UpgradeManager : MonoBehaviour
         SaveManager.SaveAllData();
 
         ApplyEffect(upgrade, localLevels[index]);
+        UpgradesChanged?.Invoke();
     }
 
     public int GetLevelByData(UpgradeData upgrade)

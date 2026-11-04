@@ -15,6 +15,15 @@ public class LocalizationManager : MonoBehaviour
 
     public static event Action OnLanguageChanged;
 
+    public void SetLanguage(Language language)
+    {
+        if (CurrentLanguage == language)
+            return;
+
+        CurrentLanguage = language;
+        OnLanguageChanged?.Invoke();
+    }
+
     private void Awake()
     {
         if (Instance == null)
@@ -68,8 +77,7 @@ public class LocalizationManager : MonoBehaviour
     [ContextMenu("Test Switch Language")]
     public void ToggleLanguage()
     {
-        CurrentLanguage = (CurrentLanguage == Language.Russian) ? Language.English : Language.Russian;
-        OnLanguageChanged?.Invoke();
+        SetLanguage((CurrentLanguage == Language.Russian) ? Language.English : Language.Russian);
         Debug.Log($"[Localization] Язык изменен на: {CurrentLanguage}");
     }
 

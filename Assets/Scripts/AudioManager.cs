@@ -10,7 +10,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioSource sfxSource;
 
     // Словарь: Ключ - сам звук (AudioClip), Значение - компонент AudioSource, который его играет
-    private Dictionary<AudioClip, AudioSource> loopingSources = new Dictionary<AudioClip, AudioSource>();
+    private readonly Dictionary<AudioClip, AudioSource> loopingSources = new();
 
     [SerializeField] public AudioClip buttonSound;
     [SerializeField] public AudioClip buySound;
@@ -23,15 +23,14 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
 
         PlayLoopingSound(OST, 0.15f);
     }
@@ -41,7 +40,7 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     public void PlaySFX(AudioClip clip)
     {
-        if (clip != null)
+        if (clip != null && sfxSource != null)
         {
             sfxSource.PlayOneShot(clip);
         }
@@ -54,18 +53,21 @@ public class AudioManager : MonoBehaviour
     {
         if (clip == null) return;
 
-        // Если этот конкретный звук уже играет, не запускаем дубликат
-        if (loopingSources.ContainsKey(clip)) return;
+        if (!loopingSources.TryGetValue(clip, out AudioSource source) || source == null)
+        {
+            source = gameObject.AddComponent<AudioSource>();
+            source.playOnAwake = false;
+            source.spatialBlend = 0f;
+            loopingSources[clip] = source;
+        }
 
-        // Создаем новый AudioSource прямо на объекте AudioManager
-        AudioSource newSource = gameObject.AddComponent<AudioSource>();
-        newSource.clip = clip;
-        newSource.loop = true;
-        newSource.volume = volume;
-        newSource.Play();
+        if (source.isPlaying)
+            return;
 
-        // Записываем в словарь, чтобы потом знать, как его остановить
-        loopingSources.Add(clip, newSource);
+        source.clip = clip;
+        source.loop = true;
+        source.volume = volume;
+        source.Play();
     }
 
     /// <summary>
@@ -75,18 +77,7 @@ public class AudioManager : MonoBehaviour
     {
         if (clip == null) return;
 
-        // Проверяем, играет ли сейчас этот звук
-        if (loopingSources.ContainsKey(clip))
-        {
-            AudioSource sourceToStop = loopingSources[clip];
-
-            sourceToStop.Stop();
-
-            // Удаляем компонент, чтобы на объекте не скапливались пустые AudioSource
-            Destroy(sourceToStop);
-
-            // Убираем запись из словаря
-            loopingSources.Remove(clip);
-        }
+        if (loopingSources.TryGetValue(clip, out AudioSource source) && source != null)
+            source.Stop();
     }
 }

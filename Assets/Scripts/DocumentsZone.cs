@@ -6,18 +6,27 @@ public class DocumentsZone : MonoBehaviour
     [SerializeField] private GameObject itemPrefab;
     [SerializeField] private Collider2D spawnZoneCollider;
 
+    private Camera mainCamera;
+
+    private void Awake()
+    {
+        mainCamera = Camera.main;
+    }
+
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && !GameServices.Instance.DocumentStorage.IsDocumentsNull)
-        {
-            var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            var mousePosition2D = new Vector2(mousePosition.x, mousePosition.y);
+        if (!Input.GetMouseButtonDown(0) || mainCamera == null || spawnZoneCollider == null)
+            return;
 
-            if (spawnZoneCollider != null && spawnZoneCollider.OverlapPoint(mousePosition2D))
-            {
-                SpawnItem(mousePosition);
-            }
-        }
+        var documentStorage = GameServices.Instance?.DocumentStorage;
+        if (documentStorage == null || documentStorage.IsDocumentsNull)
+            return;
+
+        var mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        var mousePosition2D = new Vector2(mousePosition.x, mousePosition.y);
+
+        if (spawnZoneCollider.OverlapPoint(mousePosition2D))
+            SpawnItem(mousePosition);
     }
 
     private void SpawnItem(Vector3 spawnPosition)

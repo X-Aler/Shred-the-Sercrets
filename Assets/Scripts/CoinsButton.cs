@@ -7,6 +7,8 @@ using YG;
 
 public class CoinsButton : MonoBehaviour
 {
+    private static readonly WaitForSeconds TimerRefreshInterval = new(1f);
+
     [Header("UI References")]
     [SerializeField] private TMP_Text timerText;
     [SerializeField] private Button coinsButton;
@@ -28,6 +30,7 @@ public class CoinsButton : MonoBehaviour
         if (coinsButton == null || timerText == null)
         {
             Debug.LogError("[CoinsButton] UI элементы не назначены в инспекторе!", this);
+            enabled = false;
             return;
         }
 
@@ -114,17 +117,13 @@ public class CoinsButton : MonoBehaviour
 
         float timeLeft = buffDuration;
 
-        // Визуально обновляем таймер каждый кадр, а не просто ждем 300 секунд
         while (timeLeft > 0)
         {
-            timeLeft -= Time.deltaTime;
+            int displayedTime = Mathf.CeilToInt(timeLeft);
+            timerText.SetText("2X ({0:00}:{1:00})", (float)(displayedTime / 60), (float)(displayedTime % 60));
 
-            // Форматируем время в ММ:СС
-            int minutes = Mathf.FloorToInt(timeLeft / 60F);
-            int seconds = Mathf.FloorToInt(timeLeft - minutes * 60);
-            timerText.text = string.Format("2X ({0:00}:{1:00})", minutes, seconds);
-
-            yield return null; // Ждем до следующего кадра
+            yield return TimerRefreshInterval;
+            timeLeft -= 1f;
         }
 
         // Возвращаем множитель обратно

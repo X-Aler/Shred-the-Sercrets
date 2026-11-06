@@ -1,0 +1,12 @@
+{
+  "name": "Vendor.CrazyGames.Editor",
+  "references": [
+    "Vendor.CrazyGames"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "defineConstraints": [
+    "PLATFORM_CRAZYGAMES"
+  ]
+}

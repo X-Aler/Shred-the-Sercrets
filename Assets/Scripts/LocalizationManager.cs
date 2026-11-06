@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using YG;
+using GamePlatform;
 
 public enum Language
 {
@@ -40,26 +40,7 @@ public class LocalizationManager : MonoBehaviour
 
     private void DetectLanguage()
     {
-        string langCode = "";
-
-#if !UNITY_EDITOR
-    // В билде берем язык строго из SDK Яндекса
-    if (YG2.envir != null && !string.IsNullOrEmpty(YG2.envir.language))
-    {
-        langCode = YG2.envir.language;
-    }
-#else
-        if (Application.systemLanguage != SystemLanguage.Russian &&
-            Application.systemLanguage != SystemLanguage.Ukrainian &&
-            Application.systemLanguage != SystemLanguage.Belarusian)
-        {
-            langCode = "en";
-        }
-        else
-        {
-            langCode = "ru";
-        }
-#endif
+        string langCode = PlatformServices.IsReady ? PlatformServices.Service.Language : Application.systemLanguage == SystemLanguage.Russian ? "ru" : "en";
 
         if (!string.IsNullOrEmpty(langCode) &&
            (langCode.StartsWith("ru") || langCode.StartsWith("be") || langCode.StartsWith("uk")))
@@ -84,11 +65,11 @@ public class LocalizationManager : MonoBehaviour
     private void OnEnable()
     {
         // Подписываемся на ивент готовности данных YG2
-        YG2.onGetSDKData += DetectLanguage;
+        PlatformServices.Ready += DetectLanguage;
     }
 
     private void OnDisable()
     {
-        YG2.onGetSDKData -= DetectLanguage;
+        PlatformServices.Ready -= DetectLanguage;
     }
 }

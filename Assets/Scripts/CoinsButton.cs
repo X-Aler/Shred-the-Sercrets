@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using DefaultNamespace;
-using YG;
+using GamePlatform;
 
 public class CoinsButton : MonoBehaviour
 {
@@ -87,18 +87,14 @@ public class CoinsButton : MonoBehaviour
 
         coinsButton.gameObject.SetActive(false);
 
-        YG2.RewardedAdvShow("coins");
-
-        // Запускаем сам бафф
-        if (buffCoroutine != null)
-            StopCoroutine(buffCoroutine);
-
-        buffCoroutine = StartCoroutine(TimerCoroutine());
-
-        // Сразу запускаем кулдаун на появление СЛЕДУЮЩЕЙ кнопки
-        // (если нужно, чтобы таймер 600 сек начинался только ПОСЛЕ окончания баффа, 
-        // то перенеси StartWaitCooldown() в самый конец TimerCoroutine)
-        StartWaitCooldown();
+        if (!PlatformServices.IsReady) { coinsButton.gameObject.SetActive(true); return; }
+        PlatformServices.Service.ShowRewarded("coins", success => {
+            if (this == null) return;
+            if (!success) { coinsButton.gameObject.SetActive(true); return; }
+            if (buffCoroutine != null) StopCoroutine(buffCoroutine);
+            buffCoroutine = StartCoroutine(TimerCoroutine());
+            StartWaitCooldown();
+        });
     }
 
     private IEnumerator TimerCoroutine()

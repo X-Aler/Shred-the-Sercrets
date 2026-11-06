@@ -1,6 +1,6 @@
 ﻿using DefaultNamespace;
 using UnityEngine;
-using YG;
+using GamePlatform;
 
 public class SaveManager : MonoBehaviour
 {
@@ -19,22 +19,26 @@ public class SaveManager : MonoBehaviour
         }
     }
 
-    private void OnEnable() => YG2.onGetSDKData += LoadAllData;
-    private void OnDisable() => YG2.onGetSDKData -= LoadAllData;
+    private void OnEnable() => PlatformServices.Ready += LoadAllData;
+    private void OnDisable() => PlatformServices.Ready -= LoadAllData;
 
     private void Start()
     {
-        if (YG2.isSDKEnabled)
+        if (PlatformServices.IsReady)
         {
             LoadAllData();
         }
     }
 
+    private void OnApplicationPause(bool paused) { if (paused) SaveAllData(); }
+    private void OnApplicationFocus(bool focused) { if (!focused) SaveAllData(); }
+
     // Загрузка монет и передача их в MoneyManager
     public void LoadAllData()
     {
+        if (!PlatformServices.IsReady) return;
         // 1. Загружаем баланс монет
-        int savedCoins = YG2.saves.coins;
+        int savedCoins = PlatformServices.Progress.coins;
 
         // Присваиваем баланс в ваш MoneyManager
         if (GameServices.Instance != null && GameServices.Instance.MoneyManager != null)
@@ -47,12 +51,13 @@ public class SaveManager : MonoBehaviour
     // Вызывайте этот метод при сохранении игры (или при покупке / изменении монет)
     public static void SaveAllData()
     {
+        if (!PlatformServices.IsReady) return;
         if (GameServices.Instance != null && GameServices.Instance.MoneyManager != null)
         {
-            YG2.saves.coins = GameServices.Instance.MoneyManager.Balance;
+            PlatformServices.Progress.coins = GameServices.Instance.MoneyManager.Balance;
         }
 
-        // Запись в облако Яндекса
-        YG2.SaveProgress();
+        // Сохранение через выбранную платформу
+        PlatformServices.Save();
     }
 }

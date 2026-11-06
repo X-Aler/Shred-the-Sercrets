@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -97,3 +98,5 @@ namespace CrazyGames
         }
     }
 }
+
+#endif

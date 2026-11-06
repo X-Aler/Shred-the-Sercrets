@@ -1,5 +1,5 @@
 using UnityEngine;
-using YG;
+using GamePlatform;
 
 public class ShredderController : MonoBehaviour
 {
@@ -11,12 +11,12 @@ public class ShredderController : MonoBehaviour
 
     private void OnEnable()
     {
-        YG2.onGetSDKData += UpdateShreddersVisibility;
+        PlatformServices.Ready += UpdateShreddersVisibility;
     }
 
     private void OnDisable()
     {
-        YG2.onGetSDKData -= UpdateShreddersVisibility;
+        PlatformServices.Ready -= UpdateShreddersVisibility;
     }
 
     private void Start()

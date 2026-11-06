@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 namespace CrazyGames
 {
     public interface ITab
@@ -5,3 +6,5 @@ namespace CrazyGames
         void Render();
     }
 }
+
+#endif

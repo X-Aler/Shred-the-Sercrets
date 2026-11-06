@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 ﻿using UnityEditor;
 
 namespace CrazyGames
@@ -14,3 +15,5 @@ namespace CrazyGames
         }
     }
 }
+
+#endif

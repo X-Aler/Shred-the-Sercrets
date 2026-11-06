@@ -1,7 +1,7 @@
 using System;
 using DefaultNamespace;
 using UnityEngine;
-using YG;
+using GamePlatform;
 
 public class UpgradeManager : MonoBehaviour
 {
@@ -41,12 +41,12 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    private void OnEnable() => YG2.onGetSDKData += LoadLevels;
-    private void OnDisable() => YG2.onGetSDKData -= LoadLevels;
+    private void OnEnable() => PlatformServices.Ready += LoadLevels;
+    private void OnDisable() => PlatformServices.Ready -= LoadLevels;
 
     private void Start()
     {
-        if (YG2.isSDKEnabled)
+        if (PlatformServices.IsReady)
         {
             // Если сохранения уже загружены, применяем их
             LoadLevels();
@@ -61,12 +61,12 @@ public class UpgradeManager : MonoBehaviour
 
     public void LoadLevels()
     {
-        if (YG2.saves.upgradeLevels == null || YG2.saves.upgradeLevels.Length < 6)
+        if (PlatformServices.Progress.upgradeLevels == null || PlatformServices.Progress.upgradeLevels.Length < 6)
         {
-            YG2.saves.upgradeLevels = new int[6];
+            PlatformServices.Progress.upgradeLevels = new int[6];
         }
 
-        System.Array.Copy(YG2.saves.upgradeLevels, localLevels, 6);
+        System.Array.Copy(PlatformServices.Progress.upgradeLevels, localLevels, 6);
 
         ApplyAllEffectsOnLoad();
         UpgradesChanged?.Invoke();
@@ -74,12 +74,13 @@ public class UpgradeManager : MonoBehaviour
 
     public void Upgrade(UpgradeData upgrade)
     {
+        if (!PlatformServices.IsReady) return;
         int index = GetIndexByData(upgrade);
         if (index == -1) return;
 
         localLevels[index]++;
 
-        YG2.saves.upgradeLevels[index] = localLevels[index];
+        PlatformServices.Progress.upgradeLevels[index] = localLevels[index];
 
         SaveManager.SaveAllData();
 

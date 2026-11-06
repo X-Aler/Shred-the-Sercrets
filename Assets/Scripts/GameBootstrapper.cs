@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
-using YG;
+using GamePlatform;
 
 namespace DefaultNamespace
 {
@@ -26,34 +26,18 @@ namespace DefaultNamespace
 
         private void OnEnable()
         {
-            YG2.onGetSDKData += HandleSDKReady;
+            PlatformServices.Ready += HandleSDKReady;
         }
 
         private void OnDisable()
         {
-            YG2.onGetSDKData -= HandleSDKReady;
+            PlatformServices.Ready -= HandleSDKReady;
         }
 
-        private void Start()
-        {
-            if (YG2.isSDKEnabled)
-            {
-                HandleSDKReady();
-            }
-            else
-            {
-                StartCoroutine(FallbackTimeoutRoutine(3.5f));
-            }
-        }
+        private void Start() { PlatformServices.Initialize(); if(PlatformServices.IsReady) HandleSDKReady(); }
 
-        private IEnumerator FallbackTimeoutRoutine(float delay)
-        {
-            yield return new WaitForSecondsRealtime(delay);
-            if (!_isInitialized)
-            {
-                HandleSDKReady();
-            }
-        }
+        private void OnApplicationPause(bool paused) { if (paused && _isInitialized) SaveManager.SaveAllData(); }
+        private void OnApplicationFocus(bool focused) { if (!focused && _isInitialized) SaveManager.SaveAllData(); }
 
         private void HandleSDKReady()
         {
@@ -62,14 +46,8 @@ namespace DefaultNamespace
 
             try
             {
-#if YG2_LOCALIZATION
-                YG2.SwitchLang(YG2.lang);
-                if (LocalizationManager.Instance != null)
-                {
-                    LocalizationManager.Instance.SetLanguage(
-                        (YG2.lang == "en") ? Language.English : Language.Russian);
-                }
-#endif
+                GameServices.Instance.MoneyManager.SetBalance(PlatformServices.Progress.coins);
+                UpgradeManager.Instance?.LoadLevels();
 
                 if (gameData != null) gameData.Initialize();
                 if (hudScreen != null) hudScreen.Initialize();
@@ -96,11 +74,12 @@ namespace DefaultNamespace
             yield return new WaitForEndOfFrame();
 
             // 3. Отправляем сигнал готовности платформе
-            YG2.GameReadyAPI();
+            PlatformServices.Service.GameReady();
+            PlatformServices.Service.GameplayStart();
 
             // 4. Небольшая задержка перед включением баннера (чтобы запросы не накладывались)
             yield return new WaitForSecondsRealtime(0.2f);
-            YG2.StickyAdActivity(true);
+
         }
     }
 }

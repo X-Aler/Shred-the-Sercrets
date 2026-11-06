@@ -2,7 +2,7 @@ using DefaultNamespace;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using YG;
+using GamePlatform;
 
 public class UpgradeButton : MonoBehaviour
 {
@@ -23,7 +23,7 @@ public class UpgradeButton : MonoBehaviour
 
     private void OnEnable()
     {
-        YG2.onGetSDKData += UpdateUI;
+        PlatformServices.Ready += UpdateUI;
         LocalizationManager.OnLanguageChanged += UpdateUI;
 
         if (buyButton != null)
@@ -34,7 +34,7 @@ public class UpgradeButton : MonoBehaviour
 
     private void OnDisable()
     {
-        YG2.onGetSDKData -= UpdateUI;
+        PlatformServices.Ready -= UpdateUI;
         LocalizationManager.OnLanguageChanged -= UpdateUI;
 
         if (buyButton != null)
@@ -123,7 +123,7 @@ public class UpgradeButton : MonoBehaviour
     {
         UpgradeManager upgradeManager = UpgradeManager.Instance;
         MoneyManager moneyManager = GameServices.Instance?.MoneyManager;
-        if (upgradeManager == null || moneyManager == null || data == null)
+        if (!PlatformServices.IsReady || upgradeManager == null || moneyManager == null || data == null)
             return;
 
         int currentLevel = upgradeManager.GetLevelByData(data);
@@ -144,7 +144,7 @@ public class UpgradeButton : MonoBehaviour
                 AudioManager.Instance.PlaySFX(AudioManager.Instance.buySound);
 
             UpdateUI();
-            YG2.InterstitialAdvShow();
+            PlatformServices.Service.ShowInterstitial(null);
         }
     }
 }

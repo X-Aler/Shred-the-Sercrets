@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 ﻿namespace YG.EditorScr.BuildModify
 {
     using UnityEditor.Build.Reporting;
@@ -45,3 +46,4 @@
 #endif
     }
 }
+#endif

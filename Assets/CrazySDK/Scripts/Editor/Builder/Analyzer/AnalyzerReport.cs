@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEditor;
 #if PROJECT_AUDITOR_AVAILABLE
@@ -68,3 +69,5 @@ namespace CrazyGames
         }
     }
 }
+
+#endif

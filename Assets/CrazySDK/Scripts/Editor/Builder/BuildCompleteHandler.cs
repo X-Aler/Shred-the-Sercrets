@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -96,4 +97,6 @@ namespace CrazyGames
         }
     }
 }
+#endif
+
 #endif

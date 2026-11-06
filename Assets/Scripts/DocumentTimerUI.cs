@@ -1,6 +1,6 @@
 ﻿using System;
 using TMPro;
-using YG;
+
 
 namespace DefaultNamespace
 {
@@ -20,26 +20,20 @@ namespace DefaultNamespace
             // Подписываемся на тики таймера
             timer.TimeChanged += UpdateUI;
 
-            // Подписываемся на смену языка PluginYG2, чтобы текст менялся мгновенно без ожидания тика
-#if YG2_LOCALIZATION
-            YG2.onSwitchLang += OnLanguageChanged;
-#endif
+            LocalizationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
-        private void OnLanguageChanged(string lang)
+        private void OnLanguageChanged()
         {
             UpdateUI(timer.TimeLeft);
         }
 
         private void UpdateUI(int time)
         {
-            // Проверяем язык напрямую через YG2 (или через ваш LocalizationManager, если он синхронизирован)
-#if YG2_LOCALIZATION
-            bool isEnglish = YG2.lang == "en";
-#else
+
             bool isEnglish = LocalizationManager.Instance != null &&
                              LocalizationManager.Instance.CurrentLanguage == Language.English;
-#endif
+
 
             string label = isEnglish ? "Refresh time" : "Время обновления";
             timerText.text = $"{label} - {time}";
@@ -49,9 +43,7 @@ namespace DefaultNamespace
         {
             timer.TimeChanged -= UpdateUI;
 
-#if YG2_LOCALIZATION
-            YG2.onSwitchLang -= OnLanguageChanged;
-#endif
+            LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
         }
     }
 }

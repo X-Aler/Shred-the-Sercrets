@@ -1,6 +1,9 @@
 ﻿<Solution>
+  <Project Path="Vendor.CrazyGames.csproj" />
+  <Project Path="Vendor.CrazyGames.Editor.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="Platform.Contract.csproj" />
   <Project Path="PrimeTween.Installer.csproj" />
   <Project Path="CrazyGamesDefineManager.csproj" />
 </Solution>

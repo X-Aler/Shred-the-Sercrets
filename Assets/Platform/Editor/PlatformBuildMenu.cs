@@ -18,6 +18,7 @@ public sealed class PlatformBuildMenu : IPreprocessBuildWithReport {
  var symbols=PlayerSettings.GetScriptingDefineSymbols(target).Split(';').Where(s=>s!="PLATFORM_CRAZYGAMES").ToList();
  if(crazy) symbols.Add("PLATFORM_CRAZYGAMES");
  PlayerSettings.WebGL.template=crazy ? "PROJECT:CrazyGames" : "PROJECT:YandexGames";
+ if(crazy) { PlayerSettings.WebGL.compressionFormat=WebGLCompressionFormat.Brotli; PlayerSettings.WebGL.decompressionFallback=false; }
  PlayerSettings.SetScriptingDefineSymbols(target,string.Join(";",symbols));
  var editorTarget=UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
  if(editorTarget!=target) PlayerSettings.SetScriptingDefineSymbols(editorTarget,string.Join(";",symbols));
@@ -43,6 +44,7 @@ public sealed class PlatformBuildMenu : IPreprocessBuildWithReport {
  if(report.summary.platform!=BuildTarget.WebGL) return;
 #if PLATFORM_CRAZYGAMES
  const string template="PROJECT:CrazyGames";
+ if(PlayerSettings.WebGL.compressionFormat!=WebGLCompressionFormat.Brotli || PlayerSettings.WebGL.decompressionFallback) throw new BuildFailedException("CrazyGames builds require Brotli compression without decompression fallback. Select CrazyGames again.");
 #else
  const string template="PROJECT:YandexGames";
 #endif

@@ -1,13 +1,5 @@
 {
-    "intExample": 5,
-    "strExample": "Hello!",
-    "boolExample": [
-        false,
-        false,
-        false,
-        false
-    ],
-    "idSave": 31,
+    "idSave": 32,
     "coins": 349845,
     "upgradeLevels": [
         3,
